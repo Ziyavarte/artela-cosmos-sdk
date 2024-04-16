@@ -343,6 +343,10 @@ func (app *BaseApp) ProcessProposal(req abci.RequestProcessProposal) (resp abci.
 		}
 	}()
 
+	// chainID := app.chainID
+	// nonce := uint64(req.Height) // use height as nonce
+	// scheduler.NewTaskManager(req.Height, nonce, chainID)
+
 	resp = app.processProposal(app.processProposalState.ctx, req)
 	return resp
 }
