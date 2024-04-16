@@ -13,6 +13,7 @@ require (
 	cosmossdk.io/store v1.0.2
 	cosmossdk.io/x/tx v0.13.1
 	github.com/99designs/keyring v1.2.1
+	github.com/artela-network/aspect-core
 	github.com/bgentry/speakeasy v0.1.1-0.20220910012023-760eaf8b6816
 	github.com/bits-and-blooms/bitset v1.8.0
 	github.com/chzyer/readline v1.5.1

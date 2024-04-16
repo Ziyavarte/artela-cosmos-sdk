@@ -7,7 +7,9 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/artela-network/aspect-core/djpm"
 	"github.com/cockroachdb/errors"
+	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
@@ -59,7 +61,7 @@ const (
 var _ servertypes.ABCI = (*BaseApp)(nil)
 
 // BaseApp reflects the ABCI application implementation.
-type BaseApp struct {
+type BaseApp struct { // nolint: maligned
 	// initialized on creation
 	logger            log.Logger
 	name              string                      // application name from abci.BlockInfo
@@ -193,6 +195,8 @@ type BaseApp struct {
 	//
 	// SAFETY: it's safe to do if validators validate the total gas wanted in the `ProcessProposal`, which is the case in the default handler.
 	disableBlockGasMeter bool
+	// for artela aspect
+	aspect *djpm.Aspect
 }
 
 // NewBaseApp returns a reference to an initialized BaseApp. It accepts a
@@ -262,6 +266,10 @@ func (app *BaseApp) AppVersion() uint64 {
 // Version returns the application's version string.
 func (app *BaseApp) Version() string {
 	return app.version
+}
+
+func (app *BaseApp) ChainId() string {
+	return app.chainID
 }
 
 // Logger returns the logger of the BaseApp.
@@ -465,6 +473,10 @@ func (app *BaseApp) setIndexEvents(ie []string) {
 	for _, e := range ie {
 		app.indexEvents[e] = struct{}{}
 	}
+}
+
+func (app *BaseApp) Aspect() *djpm.Aspect {
+	return app.aspect
 }
 
 // Seal seals a BaseApp. It prohibits any further modifications to a BaseApp.
@@ -832,6 +844,7 @@ func (app *BaseApp) runTx(mode execMode, txBytes []byte) (gInfo sdk.GasInfo, res
 
 	defer func() {
 		if r := recover(); r != nil {
+			app.logger.Debug("runTx panic recovered", "mode", mode, "error", r)
 			recoveryMW := newOutOfGasRecoveryMiddleware(gasWanted, ctx, app.runTxRecoveryMiddleware)
 			err, result = processRecovery(r, recoveryMW), nil
 			ctx.Logger().Error("panic recovered in runTx", "err", err)
@@ -1158,4 +1171,22 @@ func (app *BaseApp) Close() error {
 	}
 
 	return errors.Join(errs...)
+}
+
+// artela aspect add -----
+
+// DeliverStateCtx exports the ctx of deliverState for aspect local call
+func (app *BaseApp) DeliverStateCtx() (sdk.Context, error) {
+	if app.deliverState == nil {
+		return sdk.Context{}, errors.New("block not begin")
+	}
+	return app.deliverState.ctx, nil
+}
+
+// CheckStateCtx exports the ctx of checkState for aspect local call
+func (app *BaseApp) CheckStateCtx() (sdk.Context, error) {
+	if app.checkState == nil {
+		return sdk.Context{}, errors.New("checkState is nil")
+	}
+	return app.checkState.ctx, nil
 }

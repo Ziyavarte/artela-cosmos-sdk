@@ -33,4 +33,6 @@ type CometRPC interface {
 		page, perPage *int,
 		orderBy string,
 	) (*coretypes.ResultBlockSearch, error)
+
+	ConsensusParams(ctx context.Context, height *int64) (*coretypes.ResultConsensusParams, error)
 }
