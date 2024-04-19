@@ -9,7 +9,6 @@ import (
 
 	"github.com/artela-network/aspect-core/djpm"
 	"github.com/cockroachdb/errors"
-	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/crypto/tmhash"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
@@ -1177,10 +1176,10 @@ func (app *BaseApp) Close() error {
 
 // DeliverStateCtx exports the ctx of deliverState for aspect local call
 func (app *BaseApp) DeliverStateCtx() (sdk.Context, error) {
-	if app.deliverState == nil {
+	if app.finalizeBlockState == nil {
 		return sdk.Context{}, errors.New("block not begin")
 	}
-	return app.deliverState.ctx, nil
+	return app.finalizeBlockState.ctx, nil
 }
 
 // CheckStateCtx exports the ctx of checkState for aspect local call
