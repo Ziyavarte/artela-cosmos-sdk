@@ -1,7 +1,7 @@
 package iavl
 
 import (
-	dbm "github.com/cometbft/cometbft-db"
+	dbm "github.com/cosmos/cosmos-db"
 	iavldbm "github.com/cosmos/iavl/db"
 )
 
