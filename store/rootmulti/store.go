@@ -1024,9 +1024,9 @@ func (rs *Store) RollbackToVersion(target int64) error {
 			store = rs.GetCommitKVStore(key)
 			var err error
 			if rs.lazyLoading {
-				_, err = store.(*iavl.Store).LazyLoadVersionForOverwriting(target)
+				err = store.(*iavl.Store).LazyLoadVersionForOverwriting(target)
 			} else {
-				_, err = store.(*iavl.Store).LoadVersionForOverwriting(target)
+				err = store.(*iavl.Store).LoadVersionForOverwriting(target)
 			}
 			if err != nil {
 				return err
