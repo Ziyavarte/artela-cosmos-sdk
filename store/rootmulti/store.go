@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -624,6 +625,13 @@ func (rs *Store) PruneStores(clearPruningManager bool, pruningHeights []int64) (
 		rs.logger.Debug("no heights need to be pruned")
 		return nil
 	}
+	t := time.Now()
+	fmt.Printf("____________________PruneStores, from: %d, to: %d\n",
+		pruningHeights[0], pruningHeights[len(pruningHeights)-1])
+	defer func() {
+		fmt.Printf("____________________PruneStores, from: %d, to: %d, duration: %.2fms\n",
+			pruningHeights[0], pruningHeights[len(pruningHeights)-1], float64(time.Since(t).Microseconds())/1000)
+	}()
 
 	rs.logger.Debug("pruning store", "heights", pruningHeights)
 
@@ -638,8 +646,13 @@ func (rs *Store) PruneStores(clearPruningManager bool, pruningHeights []int64) (
 
 		store = rs.GetCommitKVStore(key)
 
+		t1 := time.Now()
+		fmt.Printf("_________________________DeleteVersions, store: %s\n",
+			key.Name())
 		err := store.(*iavl.Store).DeleteVersions(pruningHeights...)
 		if err == nil {
+			fmt.Printf("_________________________DeleteVersions, store: %s, duration: %.2fms\n",
+				key.Name(), float64(time.Since(t1).Microseconds())/1000)
 			continue
 		}
 

@@ -203,3 +203,8 @@ retract (
 	// do not use
 	v0.43.0
 )
+
+replace (
+	github.com/cosmos/cosmos-sdk => ../artela-cosmos-sdk
+	github.com/cosmos/iavl => ../iavl
+)
