@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -624,9 +625,18 @@ func (rs *Store) PruneStores(clearPruningManager bool, pruningHeights []int64) (
 		rs.logger.Debug("no heights need to be pruned")
 		return nil
 	}
+	t := time.Now()
+	fmt.Printf("_________PruneStores, from: %d, to: %d\n",
+		pruningHeights[0], pruningHeights[len(pruningHeights)-1])
+	defer func() {
+		fmt.Printf("_________PruneStores, from: %d, to: %d, duration: %.2fms\n",
+			pruningHeights[0], pruningHeights[len(pruningHeights)-1], float64(time.Since(t).Microseconds())/1000)
+	}()
 
 	rs.logger.Debug("pruning store", "heights", pruningHeights)
 
+	var wg sync.WaitGroup
+	errCh := make(chan error)
 	for key, store := range rs.stores {
 		rs.logger.Debug("pruning store", "key", key) // Also log store.name (a private variable)?
 
@@ -638,16 +648,37 @@ func (rs *Store) PruneStores(clearPruningManager bool, pruningHeights []int64) (
 
 		store = rs.GetCommitKVStore(key)
 
-		err := store.(*iavl.Store).DeleteVersions(pruningHeights...)
-		if err == nil {
-			continue
-		}
+		wg.Add(1)
+		go func(key types.StoreKey, store types.CommitStore) {
+			t1 := time.Now()
+			fmt.Printf("______________DeleteVersions, store: %s\n",
+				key.Name())
+			err := store.(*iavl.Store).DeleteVersions(pruningHeights...)
+			if err == nil {
+				fmt.Printf("______________DeleteVersions, store: %s, duration: %.2fms\n",
+					key.Name(), float64(time.Since(t1).Microseconds())/1000)
+				wg.Done()
+				return
+			}
 
-		if errCause := errors.Cause(err); errCause != nil && errCause != iavltree.ErrVersionDoesNotExist {
-			return err
-		}
+			if errCause := errors.Cause(err); errCause != nil && errCause != iavltree.ErrVersionDoesNotExist {
+				errCh <- err
+			}
+		}(key, store)
 	}
-	return nil
+
+	done := make(chan struct{})
+	go func() {
+		wg.Wait()
+		done <- struct{}{}
+	}()
+
+	select {
+	case <-done:
+		return nil
+	case err := <-errCh:
+		return err
+	}
 }
 
 // getStoreByName performs a lookup of a StoreKey given a store name typically
