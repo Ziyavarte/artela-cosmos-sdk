@@ -626,8 +626,6 @@ func (rs *Store) PruneStores(clearPruningManager bool, pruningHeights []int64) (
 		return nil
 	}
 	t := time.Now()
-	fmt.Printf("_________PruneStores, from: %d, to: %d\n",
-		pruningHeights[0], pruningHeights[len(pruningHeights)-1])
 	defer func() {
 		fmt.Printf("_________PruneStores, from: %d, to: %d, duration: %.2fms\n",
 			pruningHeights[0], pruningHeights[len(pruningHeights)-1], float64(time.Since(t).Microseconds())/1000)
