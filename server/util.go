@@ -398,7 +398,7 @@ func GetAppDBBackend(opts types.AppOptions) dbm.BackendType {
 		return dbm.BackendType(rv)
 	}
 
-	return dbm.GoLevelDBBackend
+	return dbm.PebbleDBBackend
 }
 
 func skipInterface(iface net.Interface) bool {
