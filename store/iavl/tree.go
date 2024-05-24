@@ -37,6 +37,7 @@ type (
 		// LoadVersionForOverwriting(targetVersion int64) (int64, error)
 		LoadVersionForOverwriting(targetVersion int64) error
 		// LazyLoadVersionForOverwriting(targetVersion int64) (int64, error)
+		Compaction()
 	}
 
 	// immutableTree is a simple wrapper around a reference to an iavl.ImmutableTree
@@ -97,6 +98,9 @@ func (it *immutableTree) GetImmutable(version int64) (*iavl.ImmutableTree, error
 
 func (it *immutableTree) AvailableVersions() []int {
 	return []int{}
+}
+
+func (it *immutableTree) Compaction() {
 }
 
 func (it *immutableTree) LoadVersionForOverwriting(targetVersion int64) error {

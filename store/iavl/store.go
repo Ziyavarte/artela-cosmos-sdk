@@ -234,6 +234,10 @@ func (st *Store) DeleteVersions(versions ...int64) error {
 	return st.tree.DeleteVersionsTo(versions[len(versions)-1])
 }
 
+func (st *Store) Compaction() {
+	st.tree.Compaction()
+}
+
 // LoadVersionForOverwriting attempts to load a tree at a previously committed
 // version, or the latest version below it. Any versions greater than targetVersion will be deleted.
 func (st *Store) LoadVersionForOverwriting(targetVersion int64) error {

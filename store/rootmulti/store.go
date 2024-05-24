@@ -464,6 +464,14 @@ func (rs *Store) Commit() types.CommitID {
 		panic(err)
 	}
 
+	for key, store := range rs.stores {
+		if store.GetStoreType() != types.StoreTypeIAVL {
+			continue
+		}
+		store = rs.GetCommitKVStore(key)
+		store.(*iavl.Store).Compaction()
+	}
+
 	return types.CommitID{
 		Version: version,
 		Hash:    rs.lastCommitInfo.Hash(),
