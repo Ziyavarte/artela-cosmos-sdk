@@ -444,8 +444,15 @@ func (app *BaseApp) Commit() abci.ResponseCommit {
 	// Write the DeliverTx state into branched storage and commit the MultiStore.
 	// The write to the DeliverTx state writes all state transitions to the root
 	// MultiStore (app.cms) so when Commit() is called is persists those values.
+	startWriteTime := time.Now()
 	app.deliverState.ms.Write()
+	app.logger.Debug("ms.Write", "height", header.Height, "cost of time",
+		fmt.Sprintf(" %.2fms", float64(time.Since(startWriteTime).Microseconds())/1000))
+
+	startCommitTime := time.Now()
 	commitID := app.cms.Commit()
+	app.logger.Debug("cms.Commit", "height", header.Height, "cost of time",
+		fmt.Sprintf(" %.2fms", float64(time.Since(startCommitTime).Microseconds())/1000))
 
 	res := abci.ResponseCommit{
 		Data:         commitID.Hash,
