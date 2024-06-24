@@ -2,13 +2,15 @@ package prefix
 
 import (
 	"crypto/rand"
+	"os"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/store/cachekv"
 
-	dbm "github.com/cometbft/cometbft-db"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/stretchr/testify/require"
 
+	log "cosmossdk.io/log"
 	tiavl "github.com/cosmos/iavl"
 
 	"github.com/cosmos/cosmos-sdk/store/dbadapter"
@@ -90,8 +92,7 @@ func testPrefixStore(t *testing.T, baseStore types.KVStore, prefix []byte) {
 
 func TestIAVLStorePrefix(t *testing.T) {
 	db := dbm.NewMemDB()
-	tree, err := tiavl.NewMutableTree(db, cacheSize, false)
-	require.NoError(t, err)
+	tree := tiavl.NewMutableTree(iavl.WrapIAVLDB(db), cacheSize, false, log.NewLogger(os.Stdout))
 	iavlStore := iavl.UnsafeNewStore(tree)
 
 	testPrefixStore(t, iavlStore, []byte("test"))

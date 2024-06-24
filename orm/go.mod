@@ -5,7 +5,7 @@ go 1.19
 require (
 	cosmossdk.io/api v0.3.1
 	cosmossdk.io/errors v1.0.0
-	github.com/cometbft/cometbft-db v0.7.0
+	github.com/cosmos/cosmos-db v0.7.0
 	github.com/cosmos/cosmos-proto v1.0.0-beta.2
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.5.9

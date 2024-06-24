@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	dbm "github.com/cosmos/cosmos-db"
 	protoio "github.com/cosmos/gogoproto/io"
 	gogotypes "github.com/cosmos/gogoproto/types"
 	iavltree "github.com/cosmos/iavl"
@@ -464,6 +464,14 @@ func (rs *Store) Commit() types.CommitID {
 		panic(err)
 	}
 
+	for key, store := range rs.stores {
+		if store.GetStoreType() != types.StoreTypeIAVL {
+			continue
+		}
+		store = rs.GetCommitKVStore(key)
+		store.(*iavl.Store).Compaction()
+	}
+
 	return types.CommitID{
 		Version: version,
 		Hash:    rs.lastCommitInfo.Hash(),
@@ -625,6 +633,13 @@ func (rs *Store) PruneStores(clearPruningManager bool, pruningHeights []int64) (
 		rs.logger.Debug("no heights need to be pruned")
 		return nil
 	}
+	t := time.Now()
+	fmt.Printf("_________PruneStores, from: %d, to: %d\n",
+		pruningHeights[0], pruningHeights[len(pruningHeights)-1])
+	defer func() {
+		fmt.Printf("_________PruneStores, from: %d, to: %d, duration: %.2fms\n",
+			pruningHeights[0], pruningHeights[len(pruningHeights)-1], float64(time.Since(t).Microseconds())/1000)
+	}()
 
 	rs.logger.Debug("pruning store", "heights", pruningHeights)
 
@@ -1056,9 +1071,9 @@ func (rs *Store) RollbackToVersion(target int64) error {
 			store = rs.GetCommitKVStore(key)
 			var err error
 			if rs.lazyLoading {
-				_, err = store.(*iavl.Store).LazyLoadVersionForOverwriting(target)
+				err = store.(*iavl.Store).LazyLoadVersionForOverwriting(target)
 			} else {
-				_, err = store.(*iavl.Store).LoadVersionForOverwriting(target)
+				err = store.(*iavl.Store).LoadVersionForOverwriting(target)
 			}
 			if err != nil {
 				return err
