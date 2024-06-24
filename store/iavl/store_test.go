@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/cachekv"
 
 	sdklog "cosmossdk.io/log"
-	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/iavl"
 	"github.com/stretchr/testify/require"
 

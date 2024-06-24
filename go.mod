@@ -20,8 +20,6 @@ require (
 	github.com/chzyer/readline v1.5.1
 	github.com/cockroachdb/apd/v2 v2.0.2
 	github.com/cometbft/cometbft v0.37.2
-	github.com/cometbft/cometbft-db v0.7.0
-	github.com/confio/ics23/go v0.9.0
 	github.com/cosmos/btcutil v1.0.5
 	github.com/cosmos/cosmos-db v1.0.2
 	github.com/cosmos/cosmos-proto v1.0.0-beta.2
@@ -95,6 +93,7 @@ require (
 	github.com/cockroachdb/redact v1.1.5 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20230807174530-cc333fc44b06 // indirect
 	github.com/coinbase/rosetta-sdk-go/types v1.0.0 // indirect
+	github.com/cometbft/cometbft-db v0.7.0 // indirect
 	github.com/cosmos/rosetta-sdk-go v0.10.0 // indirect
 	github.com/creachadair/taskgroup v0.3.2 // indirect
 	github.com/danieljoos/wincred v1.1.2 // indirect
@@ -195,7 +194,6 @@ require (
 replace (
 	// use cosmos fork of keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
-	github.com/cometbft/cometbft => ../artela-cometbft
 	// github.com/cosmos/iavl => github.com/cosmos/iavl v1.1.2
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// TODO: remove it: https://github.com/cosmos/cosmos-sdk/issues/13134
@@ -222,4 +220,9 @@ retract (
 	v0.43.0
 )
 
-replace github.com/cosmos/iavl => ../iavl
+replace (
+	github.com/cometbft/cometbft => ../artela-cometbft
+	github.com/cosmos/cosmos-db => ../cosmos-db
+	github.com/cosmos/iavl => ../iavl
+// github.com/cosmos/cosmos-db => ../cometbft-db
+)

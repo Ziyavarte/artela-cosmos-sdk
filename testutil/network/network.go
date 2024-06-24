@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	tmrangithub.com/cosmos/cosmos-db/libs/rand"
+	tmrand "github.com/cometbft/cometbft/libs/rand"
 	"github.com/cometbft/cometbft/node"
 	tmclient "github.com/cometbft/cometbft/rpc/client"
 	dbm "github.com/cosmos/cosmos-db"

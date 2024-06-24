@@ -1,16 +1,18 @@
 package iavl
 
 import (
+	"os"
 	"testing"
 
-	dbm "github.com/cometbft/cometbft-db"
+	"cosmossdk.io/log"
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/iavl"
 	"github.com/stretchr/testify/require"
 )
 
 func TestImmutableTreePanics(t *testing.T) {
 	t.Parallel()
-	immTree := iavl.NewImmutableTree(dbm.NewMemDB(), 100, false)
+	immTree := iavl.NewImmutableTree(WrapIAVLDB(dbm.NewMemDB()), 100, false, log.NewLogger(os.Stdout), iavl.InitialVersionOption(1))
 	it := &immutableTree{immTree}
 	require.Panics(t, func() { it.Set([]byte{}, []byte{}) })
 	require.Panics(t, func() { it.Remove([]byte{}) })
