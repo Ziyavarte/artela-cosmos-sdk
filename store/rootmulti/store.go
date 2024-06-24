@@ -643,6 +643,7 @@ func (rs *Store) PruneStores(clearPruningManager bool, pruningHeights []int64) (
 
 	rs.logger.Debug("pruning store", "heights", pruningHeights)
 
+	startPruneTime := time.Now()
 	var wg sync.WaitGroup
 	errCh := make(chan error)
 	for key, store := range rs.stores {
@@ -658,13 +659,12 @@ func (rs *Store) PruneStores(clearPruningManager bool, pruningHeights []int64) (
 
 		wg.Add(1)
 		go func(key types.StoreKey, store types.CommitStore) {
-			t1 := time.Now()
-			fmt.Printf("______________DeleteVersions, store: %s\n",
-				key.Name())
+			rs.logger.Debug("DeleteVersions", "store", key.Name())
+			startDeleteTime := time.Now()
 			err := store.(*iavl.Store).DeleteVersions(pruningHeights...)
 			if err == nil {
-				fmt.Printf("______________DeleteVersions, store: %s, duration: %.2fms\n",
-					key.Name(), float64(time.Since(t1).Microseconds())/1000)
+				rs.logger.Debug("DeleteVersions", "store", key.Name(), "cost of time",
+					fmt.Sprintf("%.2fms", float64(time.Since(startDeleteTime).Microseconds())/1000))
 				wg.Done()
 				return
 			}
@@ -685,6 +685,12 @@ func (rs *Store) PruneStores(clearPruningManager bool, pruningHeights []int64) (
 
 	select {
 	case <-done:
+		rs.logger.Debug(
+			"PruneStores",
+			"from", pruningHeights[0],
+			"to", pruningHeights[len(pruningHeights)-1],
+			"cost of time", fmt.Sprintf("%.2fms", float64(time.Since(startPruneTime).Microseconds())/1000),
+		)
 		return nil
 	case err := <-errCh:
 		return err
