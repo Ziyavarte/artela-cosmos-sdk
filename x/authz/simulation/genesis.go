@@ -37,7 +37,7 @@ func genGrant(r *rand.Rand, accounts []simtypes.Account, genT time.Time) []authz
 
 func generateRandomGrant(r *rand.Rand) *codectypes.Any {
 	authorizations := make([]*codectypes.Any, 2)
-	sendAuthz := banktypes.NewSendAuthorization(sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(1000))), nil)
+	sendAuthz := banktypes.NewSendAuthorization(sdk.NewCoins(sdk.NewCoin("uart", sdk.NewInt(1000))), nil)
 	authorizations[0] = newAnyAuthorization(sendAuthz)
 	authorizations[1] = newAnyAuthorization(authz.NewGenericAuthorization(sdk.MsgTypeURL(&v1.MsgSubmitProposal{})))
 
