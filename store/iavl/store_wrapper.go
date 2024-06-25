@@ -27,6 +27,10 @@ func (s *iavlStoreWrapper) NewBatchWithSize(size int) iavldbm.Batch {
 	return s.DB.NewBatchWithSize(size)
 }
 
+func (s *iavlStoreWrapper) Compaction() {
+	s.DB.Compaction()
+}
+
 func WrapIAVLDB(db dbm.DB) iavldbm.DB {
 	return &iavlStoreWrapper{db}
 }
