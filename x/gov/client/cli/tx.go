@@ -101,13 +101,13 @@ Where proposal.json contains:
       "@type": "/cosmos.bank.v1beta1.MsgSend",
       "from_address": "cosmos1...",
       "to_address": "cosmos1...",
-      "amount":[{"denom": "stake","amount": "10"}]
+      "amount":[{"denom": "art","amount": "10"}]
     }
   ],
   // metadata can be any of base64 encoded, raw text, stringified json, IPFS link to json
   // see below for example metadata
   "metadata: "4pIMOgIGx1vZGU=",
-  "deposit": "10stake"
+  "deposit": "10art"
   "title: "My proposal"
   "summary": "A short summary of my proposal"
 }
@@ -230,7 +230,7 @@ func NewCmdDeposit() *cobra.Command {
 find the proposal-id by running "%s query gov proposals".
 
 Example:
-$ %s tx gov deposit 1 10stake --from mykey
+$ %s tx gov deposit 1 10art --from mykey
 `,
 				version.AppName, version.AppName,
 			),

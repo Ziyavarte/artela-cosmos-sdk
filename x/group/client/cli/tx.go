@@ -565,9 +565,9 @@ Parameters:
 		"@type": "/cosmos.bank.v1beta1.MsgSend",
 		"from_address": "cosmos1...",
 		"to_address": "cosmos1...",
-		"amount":[{"denom": "stake","amount": "10"}]
+		"amount":[{"denom": "art","amount": "10"}]
 		"title": "My proposal",
-		"summary": "This is a proposal to send 10 stake to cosmos1...",
+		"summary": "This is a proposal to send 10 art to cosmos1...",
 	}
 	],
 	// metadata can be any of base64 encoded, raw text, stringified json, IPFS link to json
