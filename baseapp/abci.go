@@ -502,7 +502,7 @@ func (app *BaseApp) Commit() abci.ResponseCommit {
 }
 
 func (app *BaseApp) forceCompact(height int64) {
-	if app.forceCompactInterval <= 0 || (height > 0 && height%app.forceCompactInterval == 0) {
+	if app.forceCompactInterval > 0 && height > 0 && height%app.forceCompactInterval == 0 {
 		app.logger.Debug("db force compact")
 		err := app.db.ForceCompact(nil, nil)
 		if err != nil {
