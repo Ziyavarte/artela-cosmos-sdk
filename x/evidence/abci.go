@@ -1,6 +1,7 @@
 package evidence
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -17,13 +18,30 @@ import (
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k keeper.Keeper) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
 
+	defer func() {
+		if err := recover(); err != nil {
+			k.Logger(ctx).Error("0630fix-evidence BeginBlocker tmEvidence", "error", err)
+		}
+	}()
+
+	k.Logger(ctx).Info("0630fix-enter ev beginBlock")
+	// TODO temporary not slashing for ByzantineValidators
+	data, _ := json.Marshal(req.ByzantineValidators)
+	k.Logger(ctx).Info("0630fix-evidence BeginBlocker", "ByzantineValidators", string(data))
+
 	for _, tmEvidence := range req.ByzantineValidators {
 		switch tmEvidence.Type {
 		// It's still ongoing discussion how should we treat and slash attacks with
 		// premeditation. So for now we agree to treat them in the same way.
 		case abci.MisbehaviorType_DUPLICATE_VOTE, abci.MisbehaviorType_LIGHT_CLIENT_ATTACK:
-			evidence := types.FromABCIEvidence(tmEvidence)
-			k.HandleEquivocationEvidence(ctx, evidence.(*types.Equivocation))
+			evidence := types.FromABCIEvidence(tmEvidence).(*types.Equivocation)
+			k.Logger(ctx).Info("0630fix-skip evidence BeginBlocker tmEvidence",
+				"height", evidence.Height,
+				"ConsensusAddress", evidence.ConsensusAddress,
+				"power", evidence.Power,
+				"time", evidence.Time,
+			)
+			// k.HandleEquivocationEvidence(ctx, evidence.(*types.Equivocation))
 
 		default:
 			k.Logger(ctx).Error(fmt.Sprintf("ignored unknown evidence type: %s", tmEvidence.Type))
